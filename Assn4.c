@@ -26,7 +26,7 @@ const double wing_span = 10.0;
 const double chord_length = 2.0;
 const double U_inf = 15.0;
 const double rho = 1.225;
-const double angle_attack = -2;
+const double angle_attack = 2;
 const double zero_lift_angle = 0.0;
 
 
@@ -44,37 +44,37 @@ int main() {
     }
 
 
+
+for (int i = 0; i < N; i++) {
+    RHS[i] = 2 * PI * U_inf * chord_length * (alpha - alpha_L0);
+    for (int j = 0; j < N; j++) {
+        if (i == j) {
+            A[i][j] = 1.0; 
+        } else {
+            double delta_y = y[i] - y[j];
+            A[i][j] = dy / (4.0 * PI * (delta_y * delta_y + 1)); // Biot-Savart induced velocity
+        }
+    }
+}
+
+for (int iter = 0; iter < 1000; iter++) {
+    double max_error = 0.0;
     for (int i = 0; i < N; i++) {
-        RHS[i] = 2 * PI * U_inf * chord_length * (alpha - alpha_L0);
+        sum = 0.0;
         for (int j = 0; j < N; j++) {
-            if (i == j) {
-                A[i][j] = 1.0; 
-            } else {
-                double delta_y = y[i] - y[j];
-                A[i][j] = dy / (PI * delta_y);
+            if (i != j) {
+                sum += A[i][j] * Gamma[j];
             }
         }
+        dGamma = (RHS[i] - sum) / A[i][i];
+        max_error = fmax(max_error, fabs(dGamma - Gamma[i]));
+        Gamma[i] = dGamma;
     }
+    if (max_error < 1e-6) break; 
+}
 
 
-    for (int iter = 0; iter < 1000; iter++) {
-        double max_error = 0.0;
-        for (int i = 0; i < N; i++) {
-            sum = 0.0;
-            for (int j = 0; j < N; j++) {
-                if (i != j) 
-                {
-                    sum += A[i][j] * Gamma[j];
-                }
-            }
-            dGamma = (RHS[i] - sum) / A[i][i];
-            max_error = fmax(max_error, fabs(dGamma - Gamma[i]));
-            Gamma[i] = dGamma;
-        }
-        if (max_error < 1e-6) break; 
-    }
-
-   
+    
     for (int i = 0; i < N; i++) {
         Lift[i] = rho * U_inf * Gamma[i] * dy;
         L += Lift[i];
@@ -83,7 +83,7 @@ int main() {
     printf("Total Lift: %.2f N\n", L);
 
     for (int i = 0; i < N; i++){
-        printf("%f,", Gamma[i]);
+        printf("%f,", Lift[i]);
     }
     return 0;
 }
