@@ -2,7 +2,7 @@
  * Filename:        Assn4.c
  * Description:     lifting-line theory of a full (test case) and a damaged wing of TU-154 airline.
  * Authors:          Abdilahi Mohamed, Ming Yan, Luke Shen, Yujun Liu
- * Last Updated:     2024-11-15
+ * Last Updated:     2024-11-22
  *
  * Purpose:
  *   To predict the trajectory and orientation of the airliner after collision with a large tree
